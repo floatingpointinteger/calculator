@@ -4,7 +4,7 @@ public class calculate
 {
     public static double pow(double a, double b)
     {
-        if(a == 0 && b == 0)
+        if(a == 0 && b <= 0)
         {
             return Double.NaN; 
         }
@@ -43,7 +43,7 @@ public class calculate
             subS = subS + s.charAt(i);
         }
 
-        return parse(subS);
+        return calc(subS);
     }
 
     public static double calcRight(int idx, String s)
@@ -55,10 +55,44 @@ public class calculate
             subS = subS + s.charAt(i);
         }
 
-        return parse(subS);
+        return calc(subS);
     }
 
-    public static String cleaner(String s)
+    public static String clean(String inpt)
+    {
+        String s = "";
+        boolean flag = false;
+
+        for(int i = 0; i < inpt.length(); i++)
+        {
+            if(inpt.charAt(i) != ' ')
+            { 
+                if(inpt.charAt(i) == '+' || inpt.charAt(i) == '-' || inpt.charAt(i) == '/' || inpt.charAt(i) == '*' || inpt.charAt(i) == '^')
+                {
+                    flag = false;
+                }
+                
+                else if(inpt.charAt(i) <= '9' && inpt.charAt(i) >= '0' || inpt.charAt(i) == '.')
+                {
+                    if(flag)
+                    {
+                        return "";
+                    }
+
+                    if(i < inpt.length() - 1 && inpt.charAt(i + 1) == ' ')
+                    {
+                        flag = true;
+                    }
+                }
+
+                s = s + inpt.charAt(i);
+            }
+        }
+
+        return s;
+    }
+
+    public static String parse(String s)
     {
         String proposition = "";
         boolean flag = false;
@@ -86,7 +120,7 @@ public class calculate
                     proposition = proposition + "(" + ch;
                     int brackets = 0;
 
-                    for(int j = i + 1; j < s.length() && (brackets > 0 || (s.charAt(j) <= '9' && s.charAt(j) >= '0' || s.charAt(j) == '.' || s.charAt(j) == '('|| s.charAt(j) == ')')); j++, i++)
+                    for(int j = i + 1; j < s.length() && (brackets > 0 || (s.charAt(j) <= '9' && s.charAt(j) >= '0' || s.charAt(j) == '.' || s.charAt(j) == '*' || s.charAt(j) == '/' || s.charAt(j) == '^' || s.charAt(j) == '('|| s.charAt(j) == ')')); j++, i++)
                     {
                         if(j != 0 && (s.charAt(j) == '+' || s.charAt(j) == '-'))
                         {
@@ -121,13 +155,145 @@ public class calculate
 
         if(flag)
         {
-            return cleaner(proposition);
+            return parse(proposition);
         }
 
         return proposition;
     }
 
-    public static double parse(String s)
+    public static boolean grammer(String s)
+    {
+        if(s.length() == 0)
+        {
+            System.out.println("0invalid inpt");
+            return false;
+        }
+
+        int braces = 0;
+        boolean flagS = false;
+        boolean flagP = false;
+        char[] operators = {'*', '/', '^'};
+        for(int i = 0; i < s.length(); i++)
+        {
+            if(s.charAt(i) == '(')
+            {
+                braces++;
+                flagS = true;
+
+                if(i != 0 && s.charAt(i - 1) >= '0' && s.charAt(i - 1) <= '9')
+                {
+                    System.out.println("1invalid inpt");
+                    return false;
+                }
+            }
+
+            else if(s.charAt(i) <= '9' && s.charAt(i) >= '0')
+            {
+                flagS = false;
+            }
+
+            else if(s.charAt(i) == ')')
+            {
+                if(flagS)
+                {
+                    System.out.println("2invalid inpt");
+                    return false;
+                }
+
+                if(i < s.length() - 1 && ((s.charAt(i + 1) >= '0' && s.charAt(i + 1) <= '9') || s.charAt(i + 1) == '('))
+                {
+                    System.out.println("3invalid inpt");
+                    return false;
+                }
+
+                braces--;
+            }
+
+            else if(i == s.length() - 1 && s.charAt(i) != '.')
+            {
+                System.out.println("4invalid inpt");
+                return false;
+            }
+
+            else if(s.charAt(i) == '+' || s.charAt(i) == '-')
+            {
+                flagP = false;
+                if(i < s.length() - 1 && s.charAt(i + 1) == ')')
+                {
+                    System.out.println("-invalid inpt");
+                    return false;
+                }
+            }
+
+            else if(s.charAt(i) == '.')
+            {
+                if(flagP)
+                {
+                    System.out.println("9invalid inpt");
+                    return false;
+                }
+
+                flagP = true;
+            }
+
+            else
+            {
+                for(int j = 0; j < operators.length; j++)
+                {
+                    if(s.charAt(i) == operators[j])
+                    {
+                        if(i == 0)
+                        {
+                            System.out.println("5invalid inpt");
+                            return false;
+                        }
+
+                        else if(i >= s.length() - 1)
+                        {
+                            System.out.println("6invalid inpt");
+                            return false;
+                        }
+
+                        else if(!(s.charAt(i - 1) <= '9' && s.charAt(i - 1) >= '0' || s.charAt(i - 1) == ')' || s.charAt(i - 1) == '.'))
+                        {
+                            System.out.println("7invalid inpt");
+                            return false;
+                        }
+
+                        else if(!(s.charAt(i + 1) <= '9' && s.charAt(i + 1) >= '0' || s.charAt(i + 1) == '(' || s.charAt(i + 1) == '+' || s.charAt(i + 1) == '-' || s.charAt(i + 1) == '.'))
+                        {
+                            System.out.println("8invalid inpt");
+                            return false;
+                        }
+                        flagP = false;
+                        break;
+                    }
+
+                    else if(j == operators.length - 1 && !(s.charAt(i) == '+' || s.charAt(i) == '-' || s.charAt(i) == '.'))
+                    {
+                        System.out.println("*invalid inpt");
+                        return false;
+                    }
+                }
+            }
+
+            if(braces < 0)
+            {
+                System.out.println("invalid braces");
+                return false;
+            }
+
+            if(i >= s.length() - 1 && braces > 0)
+            {
+                System.out.println("invalid closing braces");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static double calc(String s)
     {
         char[] operators = {'+', '-', '*', '/', '^'};
         int opBias = operators.length - 2;
@@ -204,7 +370,7 @@ public class calculate
                 subS = subS + s.charAt(i);
             }
 
-            return parse(subS);
+            return eval(subS);
         }
 
         else if(opBias == 4)
@@ -233,186 +399,46 @@ public class calculate
         }
     }
 
+    public static double eval(String inpt)
+    {
+        String s = clean(inpt);
+        boolean valid = grammer(s);
+
+        if(!valid)
+        {
+            return Double.NaN;
+        }
+
+        String proposition = parse(s);
+        double result = calc(proposition);
+
+        if(Double.isNaN(result))
+        {
+            System.out.println("+invalid inpt");
+        }
+
+        return result;
+    }
+
     public static void main(String[] args)
     {
         Scanner sc = new Scanner(System.in);
+        String inpt = "";
 
-        String inpt = sc.nextLine();
+        while(true)
+        {
+            inpt = sc.nextLine();
+            if(inpt.equals("n"))
+            {
+                break;
+            }
+
+            double result = eval(inpt);
+            if(!Double.isNaN(result))
+            {
+                System.out.println(result);
+            }
+        }
         sc.close();
-
-        String s = "";
-        boolean flag = false;
-
-        for(int i = 0; i < inpt.length(); i++)
-        {
-            if(inpt.charAt(i) != ' ')
-            { 
-                if(inpt.charAt(i) == '+' || inpt.charAt(i) == '-' || inpt.charAt(i) == '/' || inpt.charAt(i) == '*' || inpt.charAt(i) == '^' || inpt.charAt(i) == '.')
-                {
-                    flag = false;
-                }
-                
-                else if(inpt.charAt(i) <= '9' && inpt.charAt(i) >= '0')
-                {
-                    if(flag)
-                    {
-                        System.out.println("#invalid inpt");
-                        return;
-                    }
-
-                    if(i < inpt.length() - 1 && inpt.charAt(i + 1) == ' ')
-                    {
-                        flag = true;
-                    }
-                }
-
-                s = s + inpt.charAt(i);
-            }
-        }
-
-        if(s.length() == 0)
-        {
-            System.out.println("invalid inpt");
-            return;
-        }
-
-        int braces = 0;
-        boolean flagS = false;
-        boolean flagP = false;
-        char[] operators = {'*', '/', '^'};
-        for(int i = 0; i < s.length(); i++)
-        {
-            if(s.charAt(i) == '(')
-            {
-                braces++;
-                flagS = true;
-
-                if(i != 0 && s.charAt(i - 1) >= '0' && s.charAt(i - 1) <= '9')
-                {
-                    System.out.println("1invalid inpt");
-                    return;
-                }
-            }
-
-            else if(s.charAt(i) <= '9' && s.charAt(i) >= '0')
-            {
-                flagS = false;
-            }
-
-            else if(s.charAt(i) == ')')
-            {
-                if(flagS)
-                {
-                    System.out.println("2invalid inpt");
-                    return;
-                }
-
-                if(i < s.length() - 1 && ((s.charAt(i + 1) >= '0' && s.charAt(i + 1) <= '9') || s.charAt(i + 1) == '('))
-                {
-                    System.out.println("3invalid inpt");
-                    return;
-                }
-
-                braces--;
-            }
-
-            else if(i == s.length() - 1)
-            {
-                System.out.println("4invalid inpt");
-                return;
-            }
-
-            else if(s.charAt(i) == '+' || s.charAt(i) == '-')
-            {
-                flagP = false;
-                if(i < s.length() - 1 && s.charAt(i + 1) == ')')
-                {
-                    System.out.println("invalid inpt");
-                    return;
-                }
-            }
-
-            else if(s.charAt(i) == '.')
-            {
-                if(flagP)
-                {
-                    System.out.println("9invalid inpt");
-                    return;
-                }
-
-                flagP = true;
-
-                if(i == s.length() - 1)
-                {
-                    System.out.println("10invalid inpt");
-                    return;
-                }
-
-                else if(!(s.charAt(i + 1) <= '9' && s.charAt(i + 1) >= '0'))
-                {
-                    System.out.println("11invalid inpt");
-                    return;
-                }
-            }
-
-            else
-            {
-                for(int j = 0; j < operators.length; j++)
-                {
-                    if(s.charAt(i) == operators[j])
-                    {
-                        if(i == 0)
-                        {
-                            System.out.println("5invalid inpt");
-                            return;
-                        }
-
-                        else if(i >= s.length() - 1)
-                        {
-                            System.out.println("6invalid inpt");
-                            return;
-                        }
-
-                        else if(!(s.charAt(i - 1) <= '9' && s.charAt(i - 1) >= '0' || s.charAt(i - 1) == ')'))
-                        {
-                            System.out.println("7invalid inpt");
-                            return;
-                        }
-
-                        else if(!(s.charAt(i + 1) <= '9' && s.charAt(i + 1) >= '0' || s.charAt(i + 1) == '(' || s.charAt(i + 1) == '+' || s.charAt(i + 1) == '-' || s.charAt(i + 1) == '.'))
-                        {
-                            System.out.println("8invalid inpt");
-                            return;
-                        }
-                        flagP = false;
-                        break;
-                    }
-
-                    else if(j == operators.length - 1 && !(s.charAt(i) == '+' || s.charAt(i) == '-' || s.charAt(i) == '.'))
-                    {
-                        System.out.println("*invalid inpt");
-                        return;
-                    }
-                }
-            }
-
-            if(braces < 0)
-            {
-                System.out.println("invalid braces");
-                return;
-            }
-
-            if(i >= s.length() - 1 && braces > 0)
-            {
-                System.out.println("invalid closing braces");
-                return;
-            }
-        }
-        System.out.println(s);
-        String proposition = cleaner(s);
-        
-        System.out.println(proposition);
-        double result = parse(proposition);
-        System.out.println(result);
     }
 }
