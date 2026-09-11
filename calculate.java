@@ -120,7 +120,7 @@ public class calculate
                     proposition = proposition + "(" + ch;
                     int brackets = 0;
 
-                    for(int j = i + 1; j < s.length() && (brackets > 0 || (s.charAt(j) <= '9' && s.charAt(j) >= '0' || s.charAt(j) == '.' || s.charAt(j) == '*' || s.charAt(j) == '/' || s.charAt(j) == '^' || s.charAt(j) == '('|| s.charAt(j) == ')')); j++, i++)
+                    for(int j = i + 1; j < s.length() && (brackets > 0 || (s.charAt(j) <= '9' && s.charAt(j) >= '0' || s.charAt(j) == '.' || s.charAt(j) == '^' || s.charAt(j) == '('|| s.charAt(j) == ')')); j++, i++)
                     {
                         if(j != 0 && (s.charAt(j) == '+' || s.charAt(j) == '-'))
                         {
@@ -165,7 +165,7 @@ public class calculate
     {
         if(s.length() == 0)
         {
-            System.out.println("0invalid inpt");
+            System.out.println("invalid inpt");
             return false;
         }
 
@@ -182,7 +182,7 @@ public class calculate
 
                 if(i != 0 && s.charAt(i - 1) >= '0' && s.charAt(i - 1) <= '9')
                 {
-                    System.out.println("1invalid inpt");
+                    System.out.println("invalid inpt");
                     return false;
                 }
             }
@@ -196,13 +196,13 @@ public class calculate
             {
                 if(flagS)
                 {
-                    System.out.println("2invalid inpt");
+                    System.out.println("invalid inpt");
                     return false;
                 }
 
                 if(i < s.length() - 1 && ((s.charAt(i + 1) >= '0' && s.charAt(i + 1) <= '9') || s.charAt(i + 1) == '('))
                 {
-                    System.out.println("3invalid inpt");
+                    System.out.println("invalid inpt");
                     return false;
                 }
 
@@ -211,7 +211,7 @@ public class calculate
 
             else if(i == s.length() - 1 && s.charAt(i) != '.')
             {
-                System.out.println("4invalid inpt");
+                System.out.println("invalid inpt");
                 return false;
             }
 
@@ -220,16 +220,22 @@ public class calculate
                 flagP = false;
                 if(i < s.length() - 1 && s.charAt(i + 1) == ')')
                 {
-                    System.out.println("-invalid inpt");
+                    System.out.println("invalid inpt");
                     return false;
                 }
             }
 
             else if(s.charAt(i) == '.')
             {
-                if(flagP)
+                if(s.length() == 1)
                 {
-                    System.out.println("9invalid inpt");
+                    System.out.println("invalid inpt");
+                    return false;
+                }
+
+                else if(flagP)
+                {
+                    System.out.println("invalid inpt");
                     return false;
                 }
 
@@ -244,25 +250,25 @@ public class calculate
                     {
                         if(i == 0)
                         {
-                            System.out.println("5invalid inpt");
+                            System.out.println("invalid inpt");
                             return false;
                         }
 
                         else if(i >= s.length() - 1)
                         {
-                            System.out.println("6invalid inpt");
+                            System.out.println("invalid inpt");
                             return false;
                         }
 
                         else if(!(s.charAt(i - 1) <= '9' && s.charAt(i - 1) >= '0' || s.charAt(i - 1) == ')' || s.charAt(i - 1) == '.'))
                         {
-                            System.out.println("7invalid inpt");
+                            System.out.println("invalid inpt");
                             return false;
                         }
 
                         else if(!(s.charAt(i + 1) <= '9' && s.charAt(i + 1) >= '0' || s.charAt(i + 1) == '(' || s.charAt(i + 1) == '+' || s.charAt(i + 1) == '-' || s.charAt(i + 1) == '.'))
                         {
-                            System.out.println("8invalid inpt");
+                            System.out.println("invalid inpt");
                             return false;
                         }
                         flagP = false;
@@ -271,7 +277,7 @@ public class calculate
 
                     else if(j == operators.length - 1 && !(s.charAt(i) == '+' || s.charAt(i) == '-' || s.charAt(i) == '.'))
                     {
-                        System.out.println("*invalid inpt");
+                        System.out.println("invalid inpt");
                         return false;
                     }
                 }
@@ -414,7 +420,7 @@ public class calculate
 
         if(Double.isNaN(result))
         {
-            System.out.println("+invalid inpt");
+            System.out.println("invalid inpt");
         }
 
         return result;
